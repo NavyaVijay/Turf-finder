@@ -17,37 +17,31 @@ class Home extends StatefulWidget {
 
   @override
   _HomeState createState() => _HomeState();
+
 }
 
 class _HomeState extends State<Home> {
 
   Query _ref;
+  Position pos;
   GoogleMapController mapController;
   final LatLng _center = const LatLng(19.1514765, 72.8348085);
   final Set<Marker> markers = Set();
-
-  /*addMarker(cordinate){
-
-    int id = Random().nextInt(100);
-
-    setState(() {
-      markers.add(Marker(position: cordinate, markerId: MarkerId(id.toString())));
-    });
+  Future<String> currentLocation() async {
+    pos=await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    return 'Location Recieved';
   }
-  String searchAddr;*/
-
-
   @override
-
-   initState()  {
+   initState() {
     super.initState();
       requestPermission();
       _ref=FirebaseDatabase.instance.reference()
     .child('turfdata').orderByChild('Address');
   }
 
-  void _onMapCreated(GoogleMapController controller) {
+  Future<void> _onMapCreated(GoogleMapController controller) async {
     mapController = controller;
+
   }
 
   Future<void> requestPermission() async {
@@ -55,9 +49,7 @@ class _HomeState extends State<Home> {
   }
 
   Widget _buildTurfItem({Map turf}){
-
     return Container(
-
       padding: EdgeInsets.all(10),
       height: 90,
       color: Colors.white,
@@ -121,12 +113,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-
-
-
     return  Scaffold(
-
-
       body:Stack(
         children: <Widget>[
           SafeArea(
@@ -173,23 +160,31 @@ class _HomeState extends State<Home> {
             left: 0,
             right: 0,
             bottom: 0,
-            child: FirebaseAnimatedList(query: _ref,itemBuilder: (BuildContext context,DataSnapshot snapshot,Animation<double>animation,int index){
-              Map turf = snapshot.value;
+            child:FutureBuilder(
+              future: currentLocation(),
+              builder: (BuildContext context,AsyncSnapshot snapshot){
+                if(snapshot.hasData){
+                  return Center(
+                  child:FirebaseAnimatedList(query: _ref,itemBuilder: (BuildContext context,DataSnapshot snapshot,Animation<double>animation,int index){
+                    Map turf = snapshot.value;
+                    double distance=Geolocator.distanceBetween(pos.latitude,pos.longitude,double.parse(turf['Latitude']),double.parse(turf['Longitude']));
+                    if(distance>10000){
+                      return _buildTurfItem(turf: turf);}
+                    else{
+                      return CircularProgressIndicator();
+                    }
+                  },),
+                  );
+            }
+                else{
+                  return Center(
+                    child:CircularProgressIndicator(),
+                  );
+                }
 
-              //displaying only the turfs within 10km
-              //put the user current location latitude & longitude as start latitude & LOngitude
-              double distance=Geolocator.distanceBetween(19.1514765, 72.8348085,double.parse(turf['Latitude']),double.parse(turf['Longitude']));
-              if(distance<40000){
-                markers.add(Marker(
-                  markerId:MarkerId(turf['BookingContact']),
-                  position: LatLng(double.parse(turf['Latitude']),double.parse(turf['Longitude'])),
-                  icon: BitmapDescriptor.defaultMarker,
-                  infoWindow: InfoWindow(
-                    title: turf['TurfName']
-                  )
-                ));
-                return _buildTurfItem(turf: turf);}
-            },),
+    }
+    )
+
           )
         ],
       ),
