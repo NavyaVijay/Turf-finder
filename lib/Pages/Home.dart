@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:search_map_place/search_map_place.dart';
@@ -42,8 +43,8 @@ class _HomeState extends State<Home> {
     super.initState();
       requestPermission();
       _ref=FirebaseDatabase.instance.reference()
-    .child('turfdata')
-    .orderByChild('Address').limitToFirst(5);
+    .child('turfdata').orderByChild('Address');
+
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -151,7 +152,7 @@ class _HomeState extends State<Home> {
             ),
           ),
      Positioned(
-       top:85,
+       top:55,
        left:10,
        right:10,
 
@@ -177,17 +178,11 @@ class _HomeState extends State<Home> {
             bottom: 0,
             child: FirebaseAnimatedList(query: _ref,itemBuilder: (BuildContext context,DataSnapshot snapshot,Animation<double>animation,int index){
               Map turf = snapshot.value;
-                var name=turf['TurfName'];
-                markers.add(Marker(
-                    markerId: MarkerId(turf['BookingContact']),
-                    position: LatLng(double.parse(turf['Latitude']),double.parse(turf['Longitude'])),
-                    icon: BitmapDescriptor.defaultMarker,
-                    infoWindow: InfoWindow(
-                        title: name
-                    )
-                ));
-
-              return _buildTurfItem(turf: turf);
+              //displaying only the turfs within 10km
+              //put the user current location latitude & longitude as start latitude & LOngitude
+              double distance=Geolocator.distanceBetween(19.1514765, 72.8348085,double.parse(turf['Latitude']),double.parse(turf['Longitude']));
+              if(distance<10000){
+                return _buildTurfItem(turf: turf);}
             },),
           )
         ],
