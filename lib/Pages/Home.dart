@@ -44,7 +44,6 @@ class _HomeState extends State<Home> {
       requestPermission();
       _ref=FirebaseDatabase.instance.reference()
     .child('turfdata').orderByChild('Address');
-
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -54,9 +53,7 @@ class _HomeState extends State<Home> {
   Future<void> requestPermission() async {
     await Permission.location.request();
   }
-  void _updateMarkers(){
 
-  }
   Widget _buildTurfItem({Map turf}){
 
     return Container(
@@ -178,10 +175,19 @@ class _HomeState extends State<Home> {
             bottom: 0,
             child: FirebaseAnimatedList(query: _ref,itemBuilder: (BuildContext context,DataSnapshot snapshot,Animation<double>animation,int index){
               Map turf = snapshot.value;
+
               //displaying only the turfs within 10km
               //put the user current location latitude & longitude as start latitude & LOngitude
               double distance=Geolocator.distanceBetween(19.1514765, 72.8348085,double.parse(turf['Latitude']),double.parse(turf['Longitude']));
-              if(distance<10000){
+              if(distance<40000){
+                markers.add(Marker(
+                  markerId:MarkerId(turf['BookingContact']),
+                  position: LatLng(double.parse(turf['Latitude']),double.parse(turf['Longitude'])),
+                  icon: BitmapDescriptor.defaultMarker,
+                  infoWindow: InfoWindow(
+                    title: turf['TurfName']
+                  )
+                ));
                 return _buildTurfItem(turf: turf);}
             },),
           )
