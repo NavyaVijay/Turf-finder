@@ -21,12 +21,13 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
+  double width,height;
   Query _ref;
   Position pos;
   GoogleMapController mapController;
   final LatLng _center = const LatLng(19.1514765, 72.8348085);
   final Set<Marker> markers = Set();
+
   Future<String> currentLocation() async {
     pos=await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     return 'Location Recieved';
@@ -217,21 +218,21 @@ class _HomeState extends State<Home> {
       ),
 
       body:Stack(
-
         children: <Widget>[
+
           Positioned(
             top:10,
             left:10,
               right: 0,
 
+
               child: Text("Turfs Near You",style: TextStyle(fontWeight: FontWeight.bold),)
           ),
           Positioned(
-            top: 30,
-            left: 5,
-            right: 5,
-            bottom: 550,
-
+              top:40,
+              left: 5,
+              right: 5,
+              bottom:(MediaQuery.of(context).size.height)/2+70,
             child:FutureBuilder(
               future: currentLocation(),
               builder: (BuildContext context,AsyncSnapshot snapshot){
@@ -260,13 +261,14 @@ class _HomeState extends State<Home> {
 
           ),
           Positioned(
-              top:230,
+            top:(MediaQuery.of(context).size.height)/2-140,
               left:10,
               right: 0,
+              bottom:(MediaQuery.of(context).size.height)/2+40,
               child: Text("All Turfs",style: TextStyle(fontWeight: FontWeight.bold),)
           ),
          Positioned(
-         top: 250,
+         top:(MediaQuery.of(context).size.height)/2-110,
           left: 5,
           right: 5,
          bottom: 0,
