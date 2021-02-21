@@ -50,9 +50,27 @@ class _HomeState extends State<Home> {
 
   Widget _buildTurfItem({Map turf}){
     return Container(
+      margin: EdgeInsets.all(5),
       padding: EdgeInsets.all(10),
       height: 90,
-      color: Colors.white,
+      width: 300,
+      decoration: BoxDecoration(
+          color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(10),
+          topRight: Radius.circular(10),
+          bottomLeft: Radius.circular(10),
+          bottomRight: Radius.circular(10)
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 5,
+            blurRadius: 7,
+            offset: Offset(0,3),
+          )
+        ]
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,25 +79,25 @@ class _HomeState extends State<Home> {
 
               Text(turf['TurfName'],
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 20,
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                 ),
               ),
 
-          SizedBox(height: 5,),
+          SizedBox(height: 10,),
           Row(
             children: <Widget>[
               Icon(Icons.location_on_outlined,
                 color: Colors.black,
                 size: 15,
               ),
-              SizedBox(width:6,),
+              SizedBox(width:12,),
               Column(
                 children: [
                   Text(turf['Location'],
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: 15,
                       color: Colors.black,
                     ),
                   ),
@@ -88,7 +106,7 @@ class _HomeState extends State<Home> {
             ],
           ),
 
-          SizedBox(height: 5,),
+          SizedBox(height: 10,),
           Row(
             children: <Widget>[
               Icon(Icons.phone_android,
@@ -110,62 +128,117 @@ class _HomeState extends State<Home> {
       ),
     );
   }
+  Widget _buildTurfItem1({Map turf}){
+    return Container(
+      margin: EdgeInsets.all(5),
+      padding: EdgeInsets.all(10),
+      height: 120,
+      width: 300,
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10),
+              bottomLeft: Radius.circular(10),
+              bottomRight: Radius.circular(10)
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 5,
+              blurRadius: 7,
+              offset: Offset(0,3),
+            )
+          ]
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+
+        children: [
+
+          Text(turf['TurfName'],
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          SizedBox(height: 10,),
+          Row(
+            children: <Widget>[
+              Icon(Icons.location_on_outlined,
+                color: Colors.black,
+                size: 15,
+              ),
+              SizedBox(width:12,),
+              Column(
+                children: [
+                  Text(turf['Location'],
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          SizedBox(height: 10,),
+          Row(
+            children: <Widget>[
+              Icon(Icons.phone_android,
+                color: Colors.red,
+                size: 15,
+              ),
+              SizedBox(width:6,),
+              Text(turf['BookingContact'],
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.red,
+                ),
+              ),
+
+            ],
+          ),
+
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
-      body:Stack(
-        children: <Widget>[
-          SafeArea(
-            child: GoogleMap(
-              myLocationEnabled: true,
-              onMapCreated: _onMapCreated,
-              mapType: MapType.normal,
-              tiltGesturesEnabled: true,
-              compassEnabled: false,
-              initialCameraPosition: CameraPosition(
-                target: _center,
-                zoom: 11.0,
-              ),
-             markers:Set.from(markers),
-                  /*.toSet(),
-              onTap: (cordinate){
-                mapController.animateCamera(CameraUpdate.newLatLng(cordinate));
-                addMarker(cordinate);
-              },*/
-            ),
-          ),
-     Positioned(
-       top:55,
-       left:10,
-       right:10,
+      appBar: AppBar(
+        title: const Text("Turf Finder"),
+      ),
 
-       child: SearchMapPlaceWidget(
-         placeholder: "search",
-         placeType:PlaceType.address,
-         apiKey: "AIzaSyC2Ed8NK3U_TNsH74XBu7SUcu89yIw-WhU",
-         onSelected: (Place place) async {
-           Geolocation geolocation = await place.geolocation;
-           mapController.animateCamera(CameraUpdate.newLatLng(
-             geolocation.coordinates
-           ));
-           mapController.animateCamera(
-             CameraUpdate.newLatLngBounds(geolocation.bounds,0)
-           );
-         },
-       ),
-     ),
+      body:Stack(
+
+        children: <Widget>[
           Positioned(
-            top: 550,
-            left: 0,
-            right: 0,
-            bottom: 0,
+            top:10,
+            left:10,
+              right: 0,
+
+              child: Text("Turfs Near You",style: TextStyle(fontWeight: FontWeight.bold),)
+          ),
+          Positioned(
+            top: 30,
+            left: 5,
+            right: 5,
+            bottom: 550,
+
             child:FutureBuilder(
               future: currentLocation(),
               builder: (BuildContext context,AsyncSnapshot snapshot){
                 if(snapshot.hasData){
                   return Center(
-                  child:FirebaseAnimatedList(query: _ref,itemBuilder: (BuildContext context,DataSnapshot snapshot,Animation<double>animation,int index){
+                  child:FirebaseAnimatedList(query: _ref, scrollDirection:Axis.horizontal,itemBuilder: (BuildContext context,DataSnapshot snapshot,Animation<double>animation,int index){
+
                     Map turf = snapshot.value;
                     double distance=Geolocator.distanceBetween(pos.latitude,pos.longitude,double.parse(turf['Latitude']),double.parse(turf['Longitude']));
                     if(distance>10000){
@@ -185,7 +258,23 @@ class _HomeState extends State<Home> {
     }
     )
 
-          )
+          ),
+          Positioned(
+              top:230,
+              left:10,
+              right: 0,
+              child: Text("All Turfs",style: TextStyle(fontWeight: FontWeight.bold),)
+          ),
+         Positioned(
+         top: 250,
+          left: 5,
+          right: 5,
+         bottom: 0,
+
+         child:FirebaseAnimatedList(query: _ref,itemBuilder: (BuildContext context,DataSnapshot snapshot,Animation<double>animation,int index){
+           Map turf1 = snapshot.value;
+           return _buildTurfItem1(turf: turf1);
+    }),)
         ],
       ),
     );
