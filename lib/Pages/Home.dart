@@ -10,6 +10,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:search_map_place/search_map_place.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
+
+import 'DetailScreen.dart';
 const kGoogleApiKey = "AIzaSyC2Ed8NK3U_TNsH74XBu7SUcu89yIw-WhU";
 
 
@@ -50,7 +52,16 @@ class _HomeState extends State<Home> {
   }
 
   Widget _buildTurfItem({Map turf}){
-    return Container(
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailScreen(turf:turf),
+          ),
+        );
+      },
+    child:Container(
       margin: EdgeInsets.all(5),
       padding: EdgeInsets.all(10),
       height: 90,
@@ -72,19 +83,21 @@ class _HomeState extends State<Home> {
           )
         ]
       ),
-      child: Column(
+    
+      
+      child:Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
 
         children: [
 
-              Text(turf['TurfName'],
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+          Text(turf['TurfName'],
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
 
           SizedBox(height: 10,),
           Row(
@@ -115,26 +128,38 @@ class _HomeState extends State<Home> {
                 size: 15,
               ),
               SizedBox(width:6,),
-                  Text(turf['BookingContact'],
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.red,
-                    ),
-                  ),
+              Text(turf['BookingContact'],
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.red,
+                ),
+              ),
 
             ],
           ),
 
-        ],
-      ),
+ ]
+    ),
+    ),
     );
   }
   Widget _buildTurfItem1({Map turf}){
-    return Container(
+
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailScreen(turf:turf),
+          ),
+        );
+      },
+      child:Container(
       margin: EdgeInsets.all(5),
       padding: EdgeInsets.all(10),
       height: 120,
       width: 300,
+      
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
@@ -152,6 +177,9 @@ class _HomeState extends State<Home> {
             )
           ]
       ),
+
+
+
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -207,7 +235,9 @@ class _HomeState extends State<Home> {
 
         ],
       ),
+      ),
     );
+
   }
 
   @override
@@ -238,11 +268,13 @@ class _HomeState extends State<Home> {
               builder: (BuildContext context,AsyncSnapshot snapshot){
                 if(snapshot.hasData){
                   return Center(
-                  child:FirebaseAnimatedList(query: _ref, scrollDirection:Axis.horizontal,itemBuilder: (BuildContext context,DataSnapshot snapshot,Animation<double>animation,int index){
-
+                  child:FirebaseAnimatedList(query: _ref, scrollDirection:Axis.horizontal,itemBuilder: (BuildContext context,DataSnapshot snapshot,Animation<double>animation,int index,
+                      ){
                     Map turf = snapshot.value;
+
                     double distance=Geolocator.distanceBetween(pos.latitude,pos.longitude,double.parse(turf['Latitude']),double.parse(turf['Longitude']));
                     if(distance>10000){
+
                       return _buildTurfItem(turf: turf);}
                     else{
                       return CircularProgressIndicator();
@@ -273,9 +305,10 @@ class _HomeState extends State<Home> {
           right: 5,
          bottom: 0,
 
-         child:FirebaseAnimatedList(query: _ref,itemBuilder: (BuildContext context,DataSnapshot snapshot,Animation<double>animation,int index){
-           Map turf1 = snapshot.value;
-           return _buildTurfItem1(turf: turf1);
+         child:FirebaseAnimatedList(query: _ref,
+             itemBuilder: (BuildContext context,DataSnapshot snapshot,Animation<double>animation,int index){
+             Map turf1 = snapshot.value;
+             return _buildTurfItem1(turf: turf1);
     }),)
         ],
       ),
