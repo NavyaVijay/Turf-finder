@@ -128,10 +128,27 @@ class _HomeState extends State<Home> {
                 size: 15,
               ),
               SizedBox(width:6,),
-              Text(turf['Distance'],
+              Text(turf['BookingContact'],
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.red,
+                ),
+              ),
+
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            children: <Widget>[
+              Icon(Icons.airport_shuttle,
+                color: Colors.red,
+                size: 15,
+              ),
+              SizedBox(width:6,),
+              Text(turf['Distance'],
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.black,
                 ),
               ),
 
@@ -181,7 +198,7 @@ class _HomeState extends State<Home> {
         GoogleMap(
           initialCameraPosition: CameraPosition(
             target:LatLng(pos.latitude,pos.longitude),
-            zoom: 20.0,
+            zoom:10.0,
           ),
 
         ),
@@ -228,9 +245,9 @@ class _HomeState extends State<Home> {
                     Map turf = snapshot.value;
 
                     double distance=Geolocator.distanceBetween(pos.latitude,pos.longitude,double.parse(turf['Latitude']),double.parse(turf['Longitude']));
-                    if((distance/10000)>20){
+                    if((distance/1000)>20){
                       Map turf1= snapshot.value;
-                      turf1.putIfAbsent('Distance', () => (distance/10000).toString()+' km');
+                      turf1.putIfAbsent('Distance', () => (distance/1000).toString()+' km');
                       return _buildTurfItem(turf: turf1);}
 
                   },),

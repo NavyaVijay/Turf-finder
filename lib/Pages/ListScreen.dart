@@ -27,7 +27,7 @@ class _ListScreenState extends State<ListScreen> {
   initState()  {
     super.initState();
     _ref=FirebaseDatabase.instance.reference()
-        .child('turfdata').orderByChild('Latitude');
+        .child('turfdata');
 
   }
   Widget _buildTurfItem1({Map turf}){
@@ -44,7 +44,7 @@ class _ListScreenState extends State<ListScreen> {
       child:Container(
         margin: EdgeInsets.all(5),
         padding: EdgeInsets.all(10),
-        height: 120,
+        height: 150,
         width: 300,
 
         decoration: BoxDecoration(
@@ -119,7 +119,23 @@ class _ListScreenState extends State<ListScreen> {
 
               ],
             ),
+            SizedBox(height: 5,),
+            Row(
+              children: <Widget>[
+                Icon(Icons.airport_shuttle,
+                  color: Colors.red,
+                  size: 15,
+                ),
+                SizedBox(width:6,),
+                Text(turf['Distance'],
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.black,
+                  ),
+                ),
 
+              ],
+            ),
           ],
         ),
       ),
@@ -151,8 +167,9 @@ class _ListScreenState extends State<ListScreen> {
                           Map turf = snapshot.value;
 
                           double distance=Geolocator.distanceBetween(pos.latitude,pos.longitude,double.parse(turf['Latitude']),double.parse(turf['Longitude']));
-                          if(distance>20000){
-
+                          if((distance/1000)>20){
+                            Map turf1=snapshot.value;
+                            turf1.putIfAbsent('Distance', () => (distance/1000).toString()+' km');
                             return _buildTurfItem1(turf: turf);}
                           else{
                             return CircularProgressIndicator();
