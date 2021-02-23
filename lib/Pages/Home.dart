@@ -26,9 +26,7 @@ class _HomeState extends State<Home> {
   double width,height;
   Query _ref;
   Position pos;
-  GoogleMapController mapController;
-  final LatLng _center = const LatLng(19.1514765, 72.8348085);
-  final Set<Marker> markers = Set();
+
 
   Future<String> currentLocation() async {
     pos=await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
@@ -39,13 +37,10 @@ class _HomeState extends State<Home> {
     super.initState();
       requestPermission();
       _ref=FirebaseDatabase.instance.reference()
-    .child('turfdata').orderByChild('Address');
+    .child('turfdata').orderByChild('Latitude');
   }
 
-  Future<void> _onMapCreated(GoogleMapController controller) async {
-    mapController = controller;
 
-  }
 
   Future<void> requestPermission() async {
     await Permission.location.request();
@@ -273,7 +268,7 @@ class _HomeState extends State<Home> {
                     Map turf = snapshot.value;
 
                     double distance=Geolocator.distanceBetween(pos.latitude,pos.longitude,double.parse(turf['Latitude']),double.parse(turf['Longitude']));
-                    if(distance>10000){
+                    if(distance<20000){
 
                       return _buildTurfItem(turf: turf);}
                     else{
