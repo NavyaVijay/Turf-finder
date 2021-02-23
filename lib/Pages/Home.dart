@@ -42,7 +42,7 @@ class _HomeState extends State<Home> {
     super.initState();
       requestPermission();
       _ref=FirebaseDatabase.instance.reference()
-    .child('turfdata').orderByChild('Latitude');
+    .child('turfdata');
   }
 
 
@@ -128,7 +128,7 @@ class _HomeState extends State<Home> {
                 size: 15,
               ),
               SizedBox(width:6,),
-              Text(turf['BookingContact'],
+              Text(turf['Distance'],
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.red,
@@ -228,12 +228,11 @@ class _HomeState extends State<Home> {
                     Map turf = snapshot.value;
 
                     double distance=Geolocator.distanceBetween(pos.latitude,pos.longitude,double.parse(turf['Latitude']),double.parse(turf['Longitude']));
-                    if(distance>20000){
+                    if((distance/10000)>20){
+                      Map turf1= snapshot.value;
+                      turf1.putIfAbsent('Distance', () => (distance/10000).toString()+' km');
+                      return _buildTurfItem(turf: turf1);}
 
-                      return _buildTurfItem(turf: turf);}
-                    else{
-                      return CircularProgressIndicator();
-                    }
                   },),
                   );
             }
